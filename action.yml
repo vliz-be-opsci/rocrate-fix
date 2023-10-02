@@ -1,0 +1,15 @@
+name: 'rocrate-fix'
+description: 'Fix RO-Crate metadata'
+branding:
+  icon: 'edit'
+  color: 'blue'
+inputs:
+  extra_metadata:
+    description: 'Extra metadata to add to the RO-Crate'
+    required: false
+    default: ''
+runs:
+  using: 'docker'
+  image: 'Dockerfile'
+  args:
+    - ${{ inputs.extra_metadata }}

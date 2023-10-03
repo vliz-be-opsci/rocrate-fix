@@ -8,8 +8,13 @@ pip install -r requirements.txt --no-cache-dir
 
 #copy over main.py and /src/rocrate.py to the github workspace
 cp main.py github/workspace
-cp src/rocrate.py github/workspace
 
+cd github/workspace
+mkdir src
+cd ../..
+cd src
+cp rocrate.py ../github/workspace/src
+cd ..
 cd github/workspace
 ls -al
 # copy over the extra metadata file if it exists to the main directory

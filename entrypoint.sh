@@ -3,13 +3,10 @@ pwd
 ls -a
 cd ../..
 ls -a
-cd /github/workspace
-
 echo "extra_metadata is" $1
-
 #install pip requirements
 pip install -r requirements.txt --no-cache-dir
-
+cd github/workspace
 # copy over the extra metadata file if it exists to the main directory
 if [ -f $1 ]; then
     cp $1 extra_metadata.json

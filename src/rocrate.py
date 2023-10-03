@@ -16,7 +16,7 @@ class rocrate():
         self.complete_metadata_crate()
         self.load_rocrate()
         print(self.extra_metadata_file)
-        if self.extra_metadata_file != "" or self.extra_metadata_file != "--extra_metadata":
+        if self.extra_metadata_file != "" and self.extra_metadata_file != "--extra_metadata":
             self.extra_metadata_json()
             self.add_extra_metadata()
             self.save_rocrate()

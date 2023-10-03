@@ -28,7 +28,7 @@ class rocrate():
         output: self.extra_metadata_file_json
         '''
         #load in the extra_metadata_file with is a file
-        with open(os.path.join(os.getcwd(),"github","workspace",self.extra_metadata_file), "r") as extra_metadata_file:
+        with open(os.path.join(os.getcwd(),self.extra_metadata_file), "r") as extra_metadata_file:
             self.extra_metadata_file_raw = extra_metadata_file.read()
         self.extra_metadata_file_json = json.loads(self.extra_metadata_file_raw)
         print(self.extra_metadata_file_json)
@@ -40,8 +40,8 @@ class rocrate():
         output: self.rocrate_json
         '''
         print(os.getcwd())
-        #open file os.path.join(os.getcwd(),"github","workspace", "ro-crate-metadata.json")
-        with open(os.path.join(os.getcwd(),"github","workspace", "ro-crate-metadata.json"), "r") as rocrate_file:
+        #open file os.path.join(os.getcwd(), "ro-crate-metadata.json")
+        with open(os.path.join(os.getcwd(), "ro-crate-metadata.json"), "r") as rocrate_file:
             self.rocrate_json = json.load(rocrate_file)
         print(self.rocrate_json)
         
@@ -89,7 +89,7 @@ class rocrate():
         input: self.rocrate_json
         output: self.rocrate_json
         '''
-        with open(os.path.join(os.getcwd(),"github","workspace", "ro-crate-metadata.json"), "w") as rocrate_file:
+        with open(os.path.join(os.getcwd(), "ro-crate-metadata.json"), "w") as rocrate_file:
             json.dump(self.rocrate_json, rocrate_file, indent=4)
             
         print("rocrate saved")
@@ -133,10 +133,10 @@ class rocrate():
         #make relations list variabe that is comprised of all parent_folder, relative_path and name of all the files present on the local storage of the user
         try:
             relation = []
-            for root, dirs, files in os.walk(os.path.join(os.getcwd(),"github","workspace"), topdown=False): 
+            for root, dirs, files in os.walk(os.path.join(os.getcwd()), topdown=False): 
                 
                 #check if the root path begins with src or venv and if so skip the iteration
-                if root.startswith(os.path.join(os.getcwd(),"github","workspace", "src")) or root.startswith(os.path.join(os.getcwd(),"github","workspace", "venv")):
+                if root.startswith(os.path.join(os.getcwd(), "src")) or root.startswith(os.path.join(os.getcwd(), "venv")):
                     continue
                                 
                 #make a print that shows the root path but split by the os.getcwd()

@@ -1,1 +1,16 @@
-{}
+{
+    "_:person_entity": {
+        "@type": "Person",
+        "name": "John Doe"
+    },
+    "_:person_entity2": {
+        "@type": "Person",
+        "name": "Jane Doe"
+    },
+    "./testfile.txt": {
+        "author": {"@id":"_:person_entity"}
+    },
+    "(.*)\\.txt$": {
+        "test": {"@id":"_:person_entity2"}
+    }
+}

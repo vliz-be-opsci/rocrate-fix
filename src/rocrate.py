@@ -4,6 +4,8 @@ import os
 import sys
 import time
 import json
+import validators
+import regex as re
 
 class rocrate():
     def __init__(self,extra_metadata):
@@ -12,6 +14,7 @@ class rocrate():
         print("rocrate class created")
         self.load_rocrate()
         self.complete_metadata_crate()
+        self.load_rocrate()
         if self.extra_metadata_file != "":
             self.extra_metadata_json()
             self.add_extra_metadata()
@@ -23,7 +26,10 @@ class rocrate():
         input: self.extra_metadata_file
         output: self.extra_metadata_file_json
         '''
-        self.extra_metadata_file_json = json.loads(self.extra_metadata_file)
+        #load in the extra_metadata_file with is a file
+        with open(os.path.join(os.getcwd(),self.extra_metadata_file), "r") as extra_metadata_file:
+            self.extra_metadata_file_raw = extra_metadata_file.read()
+        self.extra_metadata_file_json = json.loads(self.extra_metadata_file_raw)
         print(self.extra_metadata_file_json)
     
     def load_rocrate(self):
@@ -33,7 +39,9 @@ class rocrate():
         output: self.rocrate_json
         '''
         print(os.getcwd())
-        self.rocrate_json = json.loads(os.path.join(os.getcwd(), "ro-crate-metadata.json"))
+        #open file os.path.join(os.getcwd(), "ro-crate-metadata.json")
+        with open(os.path.join(os.getcwd(), "ro-crate-metadata.json"), "r") as rocrate_file:
+            self.rocrate_json = json.load(rocrate_file)
         print(self.rocrate_json)
         
     def add_extra_metadata(self):
@@ -46,15 +54,31 @@ class rocrate():
         #if yes then add the value of the key to the self.rocrate_json["@graph"]
         #if not check if the key to be added is a blank node or not 
         # if yes then add the key to the self.rocrate_json["@graph"]
-        for key in self.extra_metadata_file_json:
-            for item in self.rocrate_json["@graph"]:
-                if key in item:
-                    item[key] = self.extra_metadata_file_json[key]
-                else:
-                    if key[0] == "_":
-                        item[key] = self.extra_metadata_file_json[key]
-                    else:
-                        pass
+        for key, value in self.extra_metadata_file_json.items():
+            found = False
+            for node in self.rocrate_json["@graph"]:
+                print(node)
+                if node["@id"] == key:
+                    #merge the value of the key with the node
+                    node.update(value)
+                    found = True
+                
+                #check the node id as a regex expression of the key
+                #check if key doesn't start with ./ or _:
+                if key.startswith("./") == False  and key.startswith("_:") == False:
+                    regex = re.compile(key)
+                    if regex.match(node["@id"]):
+                        #merge the value of the key with the node
+                        node.update(value)
+                        found = True
+            
+            if not found:
+                #add the key to the self.rocrate_json["@graph"] if it is a blank node
+                if key.startswith("_:"):
+                    toappend = {"@id": key}
+                    toappend.update(value)
+                    self.rocrate_json["@graph"].append(toappend)
+                
         
         print(self.rocrate_json)
     
@@ -109,6 +133,11 @@ class rocrate():
         try:
             relation = []
             for root, dirs, files in os.walk(os.getcwd(), topdown=False): 
+                
+                #check if the root path begins with src or venv and if so skip the iteration
+                if root.startswith(os.path.join(os.getcwd(), "src")) or root.startswith(os.path.join(os.getcwd(), "venv")):
+                    continue
+                                
                 #make a print that shows the root path but split by the os.getcwd()
                 last_part_root = root.split(os.getcwd())[-1]
                 current_folder_name = os.path.split(last_part_root)[-1]
@@ -121,6 +150,11 @@ class rocrate():
                     print(f"nothing root : {root}")
                     parent = "./"
                     for file in files:
+                        # if the path is action.yml | Dockerfile | entrypoint.sh | README.md | requirements.txt | main.py | extra_metadata.json | .gitignore then skip the iteration
+                        # if root is cwd and file is mentioned from above then skip the iteration
+                        if root == os.getcwd() and (file == "action.yml" or file == "Dockerfile" or file == "entrypoint.sh" or file == "README.md" or file == "requirements.txt" or file == "main.py" or file == "extra_metadata.json" or file == "dev-requirements.txt" or file == ".gitignore" or file == ".env"):
+                            continue
+                        
                         if " " in file:
                             new_file = file.replace(" ", "_")
                             old_file = os.path.join(root, file)
@@ -278,7 +312,23 @@ class rocrate():
             print(e)
             return
         
+        # This part will go over the new_data["@graph"] and check if the name starts with ./src or ./venv
+        # if the node name is also one of the following then remove it from the new_data["@graph"]
+        # ./.env | ./action.yml | ./Dockerfile | ./entrypoint.sh | ./README.md | ./requirements.txt | ./main.py | extra_metadata.json | ./.gitignore
+        new_graph_data = []
+        for item in new_data["@graph"]:	
+            check = True
+            #perform @id name check
+            if item["@id"].startswith("./src") or item["@id"].startswith("./venv"):
+                check = False
+            if item["@id"] == "./.env" or item["@id"] == "./action.yml" or item["@id"] == "./Dockerfile" or item["@id"] == "./entrypoint.sh" or item["@id"] == "./README.md" or item["@id"] == "./requirements.txt" or item["@id"] == "./dev-requirements.txt" or item["@id"] == "./main.py" or item["@id"] == "./extra_metadata.json" or item["@id"] == "./.gitignore":
+                check = False
+            if check:
+                new_graph_data.append(item)
+        
+        new_data["@graph"] = new_graph_data
+                        
         #pretty print the new_data with identation of 4
-        print(f"new_data: {json.dumps(new_data, indent=4)}")
+        #print(f"new_data: {json.dumps(new_data, indent=4)}")
         self.rocrate_json = new_data
         self.save_rocrate()

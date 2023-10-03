@@ -26,3 +26,7 @@ else
     #run the main python file
     python main.py
 fi
+
+#delete main.py and /src/rocrate.py from the github workspace
+rm main.py
+rm -rf src

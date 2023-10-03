@@ -133,7 +133,7 @@ class rocrate():
         #make relations list variabe that is comprised of all parent_folder, relative_path and name of all the files present on the local storage of the user
         try:
             relation = []
-            for root, dirs, files in os.walk(os.getcwd(),"github","workspace", topdown=False): 
+            for root, dirs, files in os.walk(os.path.join(os.getcwd(),"github","workspace"), topdown=False): 
                 
                 #check if the root path begins with src or venv and if so skip the iteration
                 if root.startswith(os.path.join(os.getcwd(),"github","workspace", "src")) or root.startswith(os.path.join(os.getcwd(),"github","workspace", "venv")):

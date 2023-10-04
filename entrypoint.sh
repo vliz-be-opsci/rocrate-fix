@@ -21,7 +21,7 @@ ls -al
 if [ -f $1 ]; then
     cp $1 extra_metadata.json
     #run the main python file
-    python main.py --extra_metadata extra_metadata.json
+    python main.py extra_metadata.json
 else
     #run the main python file
     python main.py

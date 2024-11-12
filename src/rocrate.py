@@ -58,20 +58,24 @@ class rocrate():
         for key, value in self.extra_metadata_file_json.items():
             found = False
             for node in self.rocrate_json["@graph"]:
-                print(node)
-                if node["@id"] == key:
-                    #merge the value of the key with the node
-                    node.update(value)
-                    found = True
-                
-                #check the node id as a regex expression of the key
-                #check if key doesn't start with ./ or _:
-                if key.startswith("./") == False  and key.startswith("_:") == False:
-                    regex = re.compile(key)
-                    if regex.match(node["@id"]):
+                try:
+                    print(node)
+                    if node["@id"] == key:
                         #merge the value of the key with the node
                         node.update(value)
                         found = True
+                    
+                    #check the node id as a regex expression of the key
+                    #check if key doesn't start with ./ or _:
+                    if key.startswith("./") == False  and key.startswith("_:") == False:
+                        regex = re.compile(key)
+                        if regex.match(node["@id"]):
+                            #merge the value of the key with the node
+                            node.update(value)
+                            found = True
+                except Exception as e:
+                    print(f"error: {e}")
+                    print(e)
             
             if not found:
                 #add the key to the self.rocrate_json["@graph"] if it is a blank node
